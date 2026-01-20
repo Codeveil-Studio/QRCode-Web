@@ -70,6 +70,7 @@ export const createOrganization = async (
 
     const { name, userId: bodyUserId } = req.body;
     const userId = req.user?.id || bodyUserId;
+    const normalizedName = typeof name === "string" ? name.trim() : "";
 
     if (!userId) {
       res.status(401).json({
@@ -79,11 +80,112 @@ export const createOrganization = async (
       return;
     }
 
-    // Create organization
+    const { data: existingByUser, error: existingByUserError } = await adminClient
+      .from("orgs")
+      .select("id, name, created_by")
+      .eq("created_by", userId)
+      .maybeSingle();
+
+    if (existingByUserError) {
+      console.error("Error checking existing organization:", existingByUserError);
+      res.status(500).json({
+        success: false,
+        error: "Failed to create organization",
+      });
+      return;
+    }
+
+    if (existingByUser) {
+      const { error: memberUpsertError } = await adminClient
+        .from("org_members")
+        .upsert(
+          {
+            org_id: existingByUser.id,
+            user_id: userId,
+            role: "admin",
+          },
+          { onConflict: "org_id,user_id" }
+        );
+
+      if (memberUpsertError) {
+        console.error("Error ensuring user membership:", memberUpsertError);
+        res.status(500).json({
+          success: false,
+          error: "Failed to add user to organization",
+        });
+        return;
+      }
+
+      await adminClient
+        .from("organization_notification_preferences")
+        .upsert(
+          {
+            org_id: existingByUser.id,
+            critical_issue_default_channel: "both",
+            normal_issue_default_channel: "email",
+            allow_user_overrides: true,
+            notify_issue_reporter: false,
+          },
+          { onConflict: "org_id" }
+        );
+
+      const { data: existingSubscription } = await adminClient
+        .from("subscriptions")
+        .select("id")
+        .eq("org_id", existingByUser.id)
+        .maybeSingle();
+
+      if (!existingSubscription) {
+        await adminClient.from("subscriptions").insert({
+          org_id: existingByUser.id,
+          current_asset_count: 0,
+          asset_limit: 10,
+          billing_cycle: "monthly",
+          status: "active",
+          volume_tier: 1,
+          effective_unit_price: 0,
+          total_monthly_cost: 0,
+          created_by: userId,
+        });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          orgId: existingByUser.id,
+          name: existingByUser.name,
+        },
+      });
+      return;
+    }
+
+    const { data: existingByName, error: existingByNameError } = await adminClient
+      .from("orgs")
+      .select("id, created_by")
+      .eq("name", normalizedName)
+      .maybeSingle();
+
+    if (existingByNameError) {
+      console.error("Error checking organization name:", existingByNameError);
+      res.status(500).json({
+        success: false,
+        error: "Failed to create organization",
+      });
+      return;
+    }
+
+    if (existingByName) {
+      res.status(409).json({
+        success: false,
+        error: "Organization name already exists",
+      });
+      return;
+    }
+
     const { data: org, error: orgError } = await adminClient
       .from("orgs")
       .insert({
-        name: name.trim(),
+        name: normalizedName,
         created_by: userId,
       })
       .select("id, name")
@@ -549,7 +651,25 @@ export const checkEmailDomain = async (
       .eq("domain", domain)
       .single();
 
-    if (domainError && domainError.code !== "PGRST116") {
+    if (domainError) {
+      if (domainError.code === "PGRST205") {
+        res.json({
+          success: true,
+          data: {
+            hasOrganization: false,
+          },
+        });
+        return;
+      }
+      if (domainError.code === "PGRST116") {
+        res.json({
+          success: true,
+          data: {
+            hasOrganization: false,
+          },
+        });
+        return;
+      }
       console.error("Error checking email domain:", domainError);
       res.status(500).json({
         success: false,

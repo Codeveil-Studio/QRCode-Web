@@ -16,6 +16,7 @@ import typesRoutes from "./routes/types";
 import authRoutes from "./routes/auth";
 import orgsRoutes from "./routes/orgs";
 import organizationsRoutes from "./routes/organizations";
+import { checkEmailDomain } from "./controllers/organizationController";
 import subscriptionsRoutes from "./routes/subscriptions";
 import notificationsRoutes from "./routes/notifications";
 import confirmationsRoutes from "./routes/confirmations";
@@ -107,6 +108,7 @@ app.use("/api/assets", assetsRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/asset-types", typesRoutes);
 app.use("/api/orgs", orgsRoutes);
+app.get("/api/organizations/check-email-domain", checkEmailDomain);
 app.use("/api/organizations", organizationsRoutes);
 app.use("/api/subscriptions", subscriptionsRoutes);
 app.use("/api/subscription", subscriptionsRoutes); // Alias for frontend compatibility
