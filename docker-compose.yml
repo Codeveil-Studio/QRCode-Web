@@ -1,0 +1,67 @@
+version: "3.8"
+
+services:
+  # Backend service
+  backend:
+    build:
+      context: ./relay-backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend.env
+    networks:
+      - relay-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:5000/health').on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./relay
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:5000
+        NEXT_ENV: development
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend.env
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - relay-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  relay-network:
+    driver: bridge
+
+volumes:
+  relay_data:
