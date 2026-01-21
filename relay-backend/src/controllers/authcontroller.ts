@@ -8,8 +8,8 @@ const COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === "production", // Secure in production (HTTPS)
   sameSite:
     process.env.NODE_ENV === "production"
-      ? ("strict" as const)
-      : ("lax" as const), // Use 'lax' in development for cross-origin
+      ? ("none" as const) // Must be 'none' for cross-site (Vercel -> Render)
+      : ("lax" as const),
   path: "/",
   // Don't set domain in development to allow localhost cross-port cookies
   ...(process.env.NODE_ENV === "production" &&
