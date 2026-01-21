@@ -19,6 +19,9 @@ async function proxyRequest(req: NextRequest, { params }: { params: Promise<{ pa
   const headers = new Headers(req.headers);
   headers.delete("host");
   headers.delete("connection");
+  // Remove accept-encoding to prevent backend from compressing response
+  // This avoids ERR_CONTENT_DECODING_FAILED where we decode but forward the header
+  headers.delete("accept-encoding");
   
   // Explicitly set Cookie header from Next.js cookies to ensure they are passed to backend
   // This is crucial for refreshToken and other cookie-based logic
@@ -60,10 +63,24 @@ async function proxyRequest(req: NextRequest, { params }: { params: Promise<{ pa
 
     const responseData = await response.blob();
     
+    // Clean up response headers
+    const responseHeaders = new Headers(response.headers);
+    responseHeaders.delete("content-encoding");
+    responseHeaders.delete("content-length");
+    responseHeaders.delete("transfer-encoding");
+    
+    // Also remove connection and keep-alive headers as they are hop-by-hop
+    responseHeaders.delete("connection");
+    responseHeaders.delete("keep-alive");
+
+    // Remove Set-Cookie to prevent backend from confusing frontend auth
+    // (Auth is handled by the login route BFF)
+    responseHeaders.delete("set-cookie");
+
     return new NextResponse(responseData, {
       status: response.status,
       statusText: response.statusText,
-      headers: response.headers,
+      headers: responseHeaders,
     });
   } catch (error) {
     console.error(`Proxy error for ${pathString}:`, error);
