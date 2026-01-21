@@ -334,7 +334,7 @@ export const createInvite = async (
     let attempts = 0;
 
     while (!isUnique && attempts < 10) {
-      const { data: existing } = await authenticatedSupabase
+      const { data: existing } = await adminClient
         .from("invite_codes")
         .select("id")
         .eq("code", inviteCode)
@@ -360,7 +360,7 @@ export const createInvite = async (
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
-    const { data: invite, error: inviteError } = await authenticatedSupabase
+    const { data: invite, error: inviteError } = await adminClient
       .from("invite_codes")
       .insert({
         code: inviteCode,

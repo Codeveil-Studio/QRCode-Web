@@ -28,7 +28,7 @@ body {
 input,
 textarea,
 select {
-  color: #111827;
+  color: #1f2937;
 }
 
 input::placeholder,
@@ -40,7 +40,7 @@ textarea::placeholder {
   input,
   textarea,
   select {
-    color: #f3f4f6;
+    color: #1f2937;
   }
 
   input::placeholder,
