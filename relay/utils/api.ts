@@ -97,13 +97,26 @@ export const publicApiCall = async <T = any>(
 export const authAPI = {
   // Login with email and password
   login: async (email: string, password: string) => {
-    console.log("Making login request...");
-    const result = await publicApiCall("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
-    console.log("Login result:", result);
-    return result;
+    console.log("Making login request to Next.js API route...");
+    // Call the Next.js API route (relative path), NOT the backend directly
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+       console.error("Login API route error:", error);
+       return {
+         success: false,
+         error: error instanceof Error ? error.message : "Login failed",
+       };
+    }
   },
 
   // Register new user

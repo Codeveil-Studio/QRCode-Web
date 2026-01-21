@@ -82,8 +82,8 @@ export const login: RequestHandler = async (req, res) => {
     let accessToken = data.session.access_token;
     let refreshToken = data.session.refresh_token;
 
-    // Set HttpOnly cookies
-    setAuthCookies(res, accessToken, refreshToken);
+    // NO COOKIES SET HERE - tokens returned in JSON for Next.js API route to handle
+    // setAuthCookies(res, accessToken, refreshToken);
 
     // Check if user has an organization
     let hasOrganization = false;
@@ -112,6 +112,10 @@ export const login: RequestHandler = async (req, res) => {
         },
         hasOrganization,
         needsOrgSetup: !hasOrganization,
+      },
+      tokens: {
+        accessToken,
+        refreshToken,
       },
     });
   } catch (error) {
@@ -195,13 +199,19 @@ export const signup: RequestHandler = async (req, res) => {
       return;
     }
 
-    // If user is confirmed and has a session, set cookies
+    // If user is confirmed and has a session, return tokens
+    let tokens = undefined;
     if (data.session) {
-      setAuthCookies(
-        res,
-        data.session.access_token,
-        data.session.refresh_token
-      );
+      tokens = {
+        accessToken: data.session.access_token,
+        refreshToken: data.session.refresh_token,
+      };
+      // NO COOKIES SET HERE
+      // setAuthCookies(
+      //   res,
+      //   data.session.access_token,
+      //   data.session.refresh_token
+      // );
     }
 
     res.json({
@@ -214,6 +224,7 @@ export const signup: RequestHandler = async (req, res) => {
         },
         needsEmailConfirmation: !data.user.email_confirmed_at,
       },
+      tokens,
     });
   } catch (error) {
     console.error("Signup error:", error);
