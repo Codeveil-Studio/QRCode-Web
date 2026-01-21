@@ -16,7 +16,7 @@ export const apiCall = async <T = any>(
       ...((options.headers as Record<string, string>) || {}),
     };
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(endpoint, {
       ...options,
       credentials: "include", // Always include cookies
       headers,
@@ -58,8 +58,8 @@ export const publicApiCall = async <T = any>(
     if (!(options.body instanceof FormData)) {
       headers["Content-Type"] = "application/json";
     }
-    console.log("API_BASE_URL", `${API_BASE_URL}${endpoint}`);
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    console.log("Requesting:", endpoint);
+    const response = await fetch(endpoint, {
       ...options,
       credentials: "include",
       headers,

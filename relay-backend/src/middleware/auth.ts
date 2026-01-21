@@ -77,9 +77,17 @@ export const authMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Get tokens from cookies
+    // Get tokens from cookies or Authorization header
     let accessToken = req.cookies?.accessToken;
     const refreshToken = req.cookies?.refreshToken;
+
+    // Check Authorization header if no cookie
+    if (!accessToken && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith("Bearer ")) {
+        accessToken = authHeader.substring(7);
+      }
+    }
 
     if (!accessToken) {
       // If no access token but we have a refresh token, try to refresh
