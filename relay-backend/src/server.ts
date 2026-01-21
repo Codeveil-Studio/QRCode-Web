@@ -47,7 +47,32 @@ app.use(
 // CORS configuration
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        process.env.FRONTEND_URL,
+        "https://qresolve-two.vercel.app",
+        "http://localhost:3000",
+      ];
+      
+      // Check if the origin matches any allowed origin (handling trailing slashes)
+      const isAllowed = allowedOrigins.some(allowedOrigin => {
+        if (!allowedOrigin) return false;
+        // Normalize both URLs by removing trailing slashes for comparison
+        const normalizedOrigin = origin.replace(/\/$/, "");
+        const normalizedAllowed = allowedOrigin.replace(/\/$/, "");
+        return normalizedOrigin === normalizedAllowed;
+      });
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.log("Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
