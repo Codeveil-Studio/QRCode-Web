@@ -29,6 +29,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy is required for secure cookies and rate limiting when behind a proxy (like Render)
+app.set("trust proxy", 1);
+
 // Security middleware
 app.use(
   helmet({
