@@ -631,7 +631,7 @@ export const confirmEmailWithAccessToken: RequestHandler = async (req, res) => {
     }
 
     // Set auth cookies
-    setAuthCookies(res, access_token, refresh_token);
+    // setAuthCookies(res, access_token, refresh_token);
 
     // Check if user has an organization
     let hasOrganization = false;
@@ -660,6 +660,10 @@ export const confirmEmailWithAccessToken: RequestHandler = async (req, res) => {
         hasOrganization,
         needsOrgSetup: !hasOrganization,
         message: "Email confirmed and user authenticated successfully",
+      },
+      tokens: {
+        accessToken: access_token,
+        refreshToken: refresh_token,
       },
     });
   } catch (error) {

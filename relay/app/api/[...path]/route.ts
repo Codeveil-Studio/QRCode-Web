@@ -7,9 +7,12 @@ async function proxyRequest(req: NextRequest, { params }: { params: Promise<{ pa
   const { path } = await params;
   const pathString = path.join("/");
   
+  // Get query string from request
+  const searchParams = req.nextUrl.search;
+  
   // Construct target URL
   // Assumes API_BASE_URL is like "https://backend.com" (no trailing slash)
-  const targetUrl = `${API_BASE_URL}/api/${pathString}`;
+  const targetUrl = `${API_BASE_URL}/api/${pathString}${searchParams}`;
   
   // Get access token from cookies
   const cookieStore = await cookies();
