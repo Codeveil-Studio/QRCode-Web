@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { body, validationResult } from "express-validator";
 import { AuthRequest } from "../middleware/auth";
-import { getAuthenticatedSupabase } from "../utils/supabase";
+import { getAuthenticatedSupabase, adminClient } from "../utils/supabase";
 import { Asset, ApiResponse } from "../types";
 
 export const getAllAssets = async (
@@ -269,7 +269,13 @@ export const validateAsset = [
   body("metadata").optional({ nullable: true }).isObject(),
   body("status")
     .optional({ nullable: true })
-    .isIn(["active", "inactive", "maintenance"]),
+    .isIn([
+      "active",
+      "inactive",
+      "maintenance",
+      "maintenance_needed",
+      "out_of_service",
+    ]),
 ];
 
 export const createAsset = async (
@@ -344,7 +350,7 @@ export const createAsset = async (
       return;
     }
 
-    const { data: asset, error } = await supabase
+    const { data: asset, error } = await adminClient
       .from("assets")
       .insert([
         {

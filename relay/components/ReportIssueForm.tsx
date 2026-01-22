@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { issuesAPI } from "@/utils/api";
 import {
@@ -46,21 +46,19 @@ const URGENCY_LEVELS = [
   {
     value: "low",
     label: "Low",
-    color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    color: "bg-green-100 text-green-800",
     description: "Can wait a few days",
   },
   {
     value: "medium",
     label: "Medium",
-    color:
-      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+    color: "bg-yellow-100 text-yellow-800",
     description: "Should be fixed soon",
   },
   {
     value: "high",
     label: "High",
-    color:
-      "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+    color: "bg-orange-100 text-orange-800",
     description: "Needs attention today",
   },
 ];
@@ -79,6 +77,14 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // Load saved reporter details
+  useEffect(() => {
+    const savedName = localStorage.getItem("reporterName");
+    const savedEmail = localStorage.getItem("reporterEmail");
+    if (savedName) setReporterName(savedName);
+    if (savedEmail) setReporterEmail(savedEmail);
+  }, []);
 
   const handleImageSelect = (file: File) => {
     if (file && file.type.startsWith("image/")) {
@@ -162,6 +168,10 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
     setLoading(true);
 
     try {
+      // Save details for future use
+      if (reporterName) localStorage.setItem("reporterName", reporterName);
+      if (reporterEmail) localStorage.setItem("reporterEmail", reporterEmail);
+
       let imagePath = null;
 
       // Upload image if selected
@@ -206,19 +216,19 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
 
   if (submitted) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
         <div className="flex justify-center mb-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
-            <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <CheckCircle className="h-8 w-8 text-green-600" />
           </div>
         </div>
-        <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+        <h3 className="text-2xl font-semibold text-gray-900 mb-2">
           Thank You!
         </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-gray-600 mb-4">
           Your issue report has been submitted successfully.
         </p>
-        <p className="text-sm text-gray-500 dark:text-gray-500">
+        <p className="text-sm text-gray-500">
           Our team will review your report and take appropriate action.
           {reporterEmail && " We'll keep you updated via email."}
         </p>
@@ -227,12 +237,12 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
       <div className="mb-4 sm:mb-6">
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-          What's the issue?
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+          What&apos;s the issue?
         </h3>
-        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+        <p className="text-sm sm:text-base text-gray-600">
           Please provide details about the problem you've encountered.
         </p>
       </div>
@@ -240,7 +250,7 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {/* Issue Type */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
             Type of Issue (Optional)
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
@@ -253,13 +263,13 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
                 }
                 className={`p-3 sm:p-4 border rounded-xl text-left transition-colors ${
                   issueType === type.value
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                    : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    ? "border-blue-500 bg-blue-50 text-blue-700"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                 }`}
               >
                 <div className="flex items-center gap-2 sm:gap-3">
                   <span className="text-lg sm:text-xl">{type.icon}</span>
-                  <span className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">
+                  <span className="text-sm sm:text-base font-medium text-gray-900">
                     {type.label}
                   </span>
                 </div>
@@ -270,7 +280,7 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
 
         {/* Urgency Level */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
             <AlertTriangle className="inline h-4 w-4 mr-1" />
             How urgent is this?
           </label>
@@ -282,8 +292,8 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
                 onClick={() => setUrgency(level.value)}
                 className={`w-full p-3 border rounded-xl text-left transition-colors ${
                   urgency === level.value
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900"
-                    : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -293,7 +303,7 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
                     >
                       {level.label}
                     </span>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="text-sm text-gray-600">
                       {level.description}
                     </span>
                   </div>
@@ -304,19 +314,19 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
         </div>
 
         {/* Critical Issue Checkbox */}
-        <div className="border border-red-200 dark:border-red-800 rounded-xl p-3 sm:p-4 bg-red-50 dark:bg-red-950">
+        <div className="border border-red-200 rounded-xl p-3 sm:p-4 bg-red-50">
           <label className="flex items-start gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={isCritical}
               onChange={(e) => setIsCritical(e.target.checked)}
-              className="w-4 h-4 text-red-600 dark:text-red-500 rounded focus:ring-red-500 mt-0.5 sm:mt-1 flex-shrink-0"
+              className="w-4 h-4 text-red-600 rounded focus:ring-red-500 mt-0.5 sm:mt-1 flex-shrink-0"
             />
             <div>
-              <span className="text-sm sm:text-base font-medium text-red-900 dark:text-red-200">
+              <span className="text-sm sm:text-base font-medium text-red-900">
                 🚨 This is a critical safety or emergency issue
               </span>
-              <p className="text-xs sm:text-sm text-red-700 dark:text-red-300 mt-1">
+              <p className="text-xs sm:text-sm text-red-700 mt-1">
                 Check this if the issue poses immediate danger or completely
                 prevents operation
               </p>
@@ -328,7 +338,7 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
         <div>
           <label
             htmlFor="description"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="block text-sm font-medium text-gray-700 mb-2"
           >
             <MessageSquare className="inline h-4 w-4 mr-1" />
             Describe the issue (Optional)
@@ -338,17 +348,17 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
-            className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none text-sm sm:text-base bg-white text-gray-900"
             placeholder="Please describe what's wrong and any steps you took..."
           />
         </div>
 
         {/* Image Upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
             📸 Add a Photo (Optional)
           </label>
-          <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+          <p className="text-xs text-gray-600 mb-3">
             A photo can help us understand the issue better
           </p>
 
@@ -357,7 +367,7 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
               <img
                 src={imagePreview}
                 alt="Issue preview"
-                className="w-full max-w-xs h-auto rounded-xl border border-gray-200 dark:border-gray-600"
+                className="w-full max-w-xs h-auto rounded-xl border border-gray-200"
               />
               <button
                 type="button"
@@ -372,10 +382,10 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
               <button
                 type="button"
                 onClick={handleCameraCapture}
-                className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+                className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-colors"
               >
-                <Camera className="h-6 w-6 text-gray-400 dark:text-gray-500 mb-2" />
-                <span className="text-xs text-gray-600 dark:text-gray-400 text-center">
+                <Camera className="h-6 w-6 text-gray-400 mb-2" />
+                <span className="text-xs text-gray-600 text-center">
                   Take Photo
                 </span>
               </button>
@@ -383,10 +393,10 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
               <button
                 type="button"
                 onClick={handleFileUpload}
-                className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+                className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-colors"
               >
-                <Upload className="h-6 w-6 text-gray-400 dark:text-gray-500 mb-2" />
-                <span className="text-xs text-gray-600 dark:text-gray-400 text-center">
+                <Upload className="h-6 w-6 text-gray-400 mb-2" />
+                <span className="text-xs text-gray-600 text-center">
                   Upload Image
                 </span>
               </button>
@@ -416,11 +426,11 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
         </div>
 
         {/* Reporter Information */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 sm:pt-6">
-          <h4 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">
+        <div className="border-t border-gray-200 pt-4 sm:pt-6">
+          <h4 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">
             Your Information (Optional)
           </h4>
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-xs sm:text-sm text-gray-600 mb-4">
             Help us follow up with you if needed.
           </p>
 
@@ -428,7 +438,7 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
             <div>
               <label
                 htmlFor="reporterName"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 <User className="inline h-4 w-4 mr-1" />
                 Your Name
@@ -438,7 +448,7 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
                 id="reporterName"
                 value={reporterName}
                 onChange={(e) => setReporterName(e.target.value)}
-                className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base bg-white text-gray-900"
                 placeholder="John Doe"
               />
             </div>
@@ -446,7 +456,7 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
             <div>
               <label
                 htmlFor="reporterEmail"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 <Mail className="inline h-4 w-4 mr-1" />
                 Email Address
@@ -456,7 +466,7 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
                 id="reporterEmail"
                 value={reporterEmail}
                 onChange={(e) => setReporterEmail(e.target.value)}
-                className="w-full px-3 sm:px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base bg-white text-gray-900"
                 placeholder="john@example.com"
               />
             </div>
@@ -470,10 +480,10 @@ export function ReportIssueForm({ asset }: ReportIssueFormProps) {
             disabled={loading}
             className={`w-full px-4 sm:px-6 py-4 rounded-xl font-medium text-white transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${
               loading
-                ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                ? "bg-gray-400 cursor-not-allowed"
                 : isCritical
-                ? "bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
-                : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+                ? "bg-red-600 hover:bg-red-700"
+                : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
             {loading ? (

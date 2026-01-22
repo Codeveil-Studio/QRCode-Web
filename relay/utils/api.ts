@@ -270,8 +270,8 @@ export const issuesAPI = {
   // POST upload image (public endpoint, no auth required)
   uploadImage: (file: File, assetId: string) => {
     const formData = new FormData();
-    formData.append("image", file);
     formData.append("assetId", assetId);
+    formData.append("image", file);
 
     return publicApiCall("/api/issues/upload-image", {
       method: "POST",

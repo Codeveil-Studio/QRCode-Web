@@ -95,13 +95,18 @@ export function IssueResolutionChart({
   ];
 
   const chartData = data && data.length > 0 ? data : emptyData;
+  const safeChartData = chartData.map((item) => ({
+    ...item,
+    created: Number.isNaN(Number(item.created)) ? 0 : Number(item.created),
+    resolved: Number.isNaN(Number(item.resolved)) ? 0 : Number(item.resolved),
+  }));
   const isEmpty = !data || data.length === 0;
 
   return (
     <ChartWrapper title="Issue Resolution Trends">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={chartData}
+          data={safeChartData}
           margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke={COLORS.light} />
@@ -182,13 +187,19 @@ export function IssuesPerAssetTypeChart({
   ];
 
   const chartData = data && data.length > 0 ? data : emptyData;
+  const safeChartData = chartData.map((item) => ({
+    ...item,
+    issueCount: Number.isNaN(Number(item.issueCount))
+      ? 0
+      : Number(item.issueCount),
+  }));
   const isEmpty = !data || data.length === 0;
 
   return (
     <ChartWrapper title="Issues by Asset Type">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={chartData}
+          data={safeChartData}
           margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke={COLORS.light} />
@@ -205,7 +216,7 @@ export function IssuesPerAssetTypeChart({
             stroke={COLORS.gray}
             fontSize={12}
             tickLine={false}
-            domain={[0, "dataMax + 2"]}
+            domain={[0, (dataMax: number) => (dataMax || 0) + 2]}
           />
           <Tooltip content={<CustomTooltip />} />
           <Bar
@@ -252,13 +263,17 @@ export function AssetsAddedChart({ data }: { data: AssetsAddedData[] }) {
   ];
 
   const chartData = data && data.length > 0 ? data : emptyData;
+  const safeChartData = chartData.map((item) => ({
+    ...item,
+    count: Number.isNaN(Number(item.count)) ? 0 : Number(item.count),
+  }));
   const isEmpty = !data || data.length === 0;
 
   return (
     <ChartWrapper title="Assets Added Over Time">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={chartData}
+          data={safeChartData}
           margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke={COLORS.light} />
@@ -323,14 +338,20 @@ export function TopAssetsWithIssuesChart({ data }: { data: TopAssetsData[] }) {
   ];
 
   const chartData = data && data.length > 0 ? data : emptyData;
+  const safeChartData = chartData.map((item) => ({
+    ...item,
+    issueCount: Number.isNaN(Number(item.issueCount))
+      ? 0
+      : Number(item.issueCount),
+  }));
   const isEmpty = !data || data.length === 0;
 
   return (
     <ChartWrapper title="Top 10 Assets with Most Issues">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={chartData}
-          layout="horizontal"
+          data={safeChartData}
+          layout="vertical"
           margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke={COLORS.light} />
@@ -339,7 +360,7 @@ export function TopAssetsWithIssuesChart({ data }: { data: TopAssetsData[] }) {
             stroke={COLORS.gray}
             fontSize={12}
             tickLine={false}
-            domain={[0, "dataMax + 1"]}
+            domain={[0, (dataMax: number) => (dataMax || 0) + 1]}
           />
           <YAxis
             type="category"
@@ -400,13 +421,19 @@ export function UpcomingMaintenanceChart({
   ];
 
   const chartData = data && data.length > 0 ? data : emptyData;
+  const safeChartData = chartData.map((item) => ({
+    ...item,
+    daysUntilMaintenance: Number.isNaN(Number(item.daysUntilMaintenance))
+      ? 0
+      : Number(item.daysUntilMaintenance),
+  }));
   const isEmpty = !data || data.length === 0;
 
   return (
     <ChartWrapper title="Assets with Upcoming Maintenance (Next 30 Days)">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={chartData}
+          data={safeChartData}
           margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke={COLORS.light} />
@@ -423,7 +450,7 @@ export function UpcomingMaintenanceChart({
             stroke={COLORS.gray}
             fontSize={12}
             tickLine={false}
-            domain={[0, "dataMax + 2"]}
+            domain={[0, (dataMax: number) => (dataMax || 0) + 2]}
             label={{
               value: "Days Until Maintenance",
               angle: -90,
@@ -478,6 +505,13 @@ export function AssetUtilizationPieChart({
   ];
 
   const chartData = data && data.length > 0 ? data : emptyData;
+  const safeChartData = chartData.map((item) => ({
+    ...item,
+    count: Number.isNaN(Number(item.count)) ? 0 : Number(item.count),
+    percentage: Number.isNaN(Number(item.percentage))
+      ? 0
+      : Number(item.percentage),
+  }));
   const isEmpty = !data || data.length === 0;
 
   const renderCustomLabel = ({
@@ -489,6 +523,8 @@ export function AssetUtilizationPieChart({
     percent,
   }: any) => {
     if (isEmpty) return null; // Don't show percentages for empty state
+
+    const safePercent = Number.isNaN(Number(percent)) ? 0 : percent;
 
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -505,7 +541,7 @@ export function AssetUtilizationPieChart({
         fontSize={12}
         fontWeight={500}
       >
-        {`${(percent * 100).toFixed(0)}%`}
+        {`${(safePercent * 100).toFixed(0)}%`}
       </text>
     );
   };
@@ -515,7 +551,7 @@ export function AssetUtilizationPieChart({
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={chartData}
+            data={safeChartData}
             cx="50%"
             cy="50%"
             labelLine={false}

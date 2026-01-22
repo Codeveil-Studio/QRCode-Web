@@ -61,18 +61,18 @@ interface IssuesData {
 const getUrgencyColor = (urgency: string, isCritical?: boolean) => {
   // If marked as critical, always show red regardless of urgency level
   if (isCritical) {
-    return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+    return "bg-red-100 text-red-800";
   }
 
   switch (urgency) {
     case "low":
-      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      return "bg-green-100 text-green-800";
     case "medium":
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+      return "bg-yellow-100 text-yellow-800";
     case "high":
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+      return "bg-orange-100 text-orange-800";
     default:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200";
+      return "bg-gray-100 text-gray-800";
   }
 };
 const collectMetadata = async () => {
@@ -299,12 +299,12 @@ export default function ReportIssuePage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-3 px-3">
+      <div className="min-h-screen bg-gray-50 py-3 px-3">
         <div className="max-w-md mx-auto">
           <div className="animate-pulse">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-4">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
             </div>
           </div>
         </div>
@@ -314,9 +314,9 @@ export default function ReportIssuePage({
 
   if (error || !asset) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-3 px-3">
+      <div className="min-h-screen bg-gray-50 py-3 px-3">
         <div className="max-w-md mx-auto text-center">
-          <div className="text-red-600 dark:text-red-400 mb-4">
+          <div className="text-red-600 mb-4">
             <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
             <p>{error || "Asset not found"}</p>
           </div>
@@ -326,43 +326,43 @@ export default function ReportIssuePage({
   }
 
   return (
-    <div className="min-h-screen pb-10 bg-gray-50 dark:bg-gray-900 py-3 px-3">
+    <div className="min-h-screen pb-10 bg-gray-50 py-3 px-3">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-4">
           <div className="flex justify-center mb-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
-              <Package className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+              <Package className="h-6 w-6 text-blue-600" />
             </div>
           </div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+          <h1 className="text-xl font-bold text-gray-900 mb-1">
             {asset.name}
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+          <p className="text-sm text-gray-600 mb-1">
             {asset.location}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-500">
+          <p className="text-xs text-gray-500">
             Current and recent issues
           </p>
         </div>
 
         {/* Current Issues */}
         {issuesData?.openIssues && issuesData.openIssues.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4">
             <button
               onClick={() => setShowCurrentIssues(!showCurrentIssues)}
               className="w-full flex items-center justify-between text-left"
             >
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                <AlertTriangle className="h-5 w-5 text-orange-600" />
+                <h3 className="text-base font-semibold text-gray-900">
                   Current Issues ({issuesData.openIssues.length})
                 </h3>
               </div>
               {showCurrentIssues ? (
-                <ChevronDown className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <ChevronDown className="h-5 w-5 text-gray-400" />
               ) : (
-                <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <ChevronRight className="h-5 w-5 text-gray-400" />
               )}
             </button>
 
@@ -371,7 +371,7 @@ export default function ReportIssuePage({
                 {issuesData.openIssues.map((issue) => (
                   <div
                     key={issue.id}
-                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+                    className="border border-gray-200 rounded-lg p-3"
                   >
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="flex-1">
@@ -387,20 +387,20 @@ export default function ReportIssuePage({
                           </span>
                         </div>
                         {issue.issue_type && (
-                          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 mt-2">
+                          <p className="text-xs text-gray-600 mb-1 mt-2">
                             {issue.issue_type}
                           </p>
                         )}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
                         <Calendar className="h-3 w-3" />
                         {formatDate(issue.reported_at)}
                       </div>
                     </div>
                     {issue.description && (
                       <div className="flex items-start gap-2 mb-3">
-                        <MessageSquare className="h-4 w-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                        <MessageSquare className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-gray-700">
                           {issue.description}
                         </p>
                       </div>
@@ -410,7 +410,7 @@ export default function ReportIssuePage({
                       <div className="flex items-center gap-2">
                         {issue.confirmation_count !== undefined &&
                           issue.confirmation_count > 0 && (
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-gray-500">
                               {issue.confirmation_count}{" "}
                               {issue.confirmation_count === 1
                                 ? "person"
@@ -420,7 +420,7 @@ export default function ReportIssuePage({
                           )}
                       </div>
                       {confirmedIssues.has(issue.uid) ? (
-                        <div className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900 rounded-md">
+                        <div className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 rounded-md">
                           <CheckCircle className="h-3 w-3" />
                           <span>Confirmed</span>
                         </div>
@@ -430,13 +430,13 @@ export default function ReportIssuePage({
                           disabled={loadingMeToo === issue.uid}
                           className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                             loadingMeToo === issue.uid
-                              ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                              : "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900 hover:bg-blue-100 dark:hover:bg-blue-800"
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "text-blue-600 bg-blue-50 hover:bg-blue-100"
                           }`}
                         >
                           {loadingMeToo === issue.uid ? (
                             <>
-                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-400 dark:border-gray-500"></div>
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-400"></div>
                               <span>Adding...</span>
                             </>
                           ) : (
@@ -457,20 +457,20 @@ export default function ReportIssuePage({
 
         {/* Me Too Form */}
         {showMeTooForm && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                <h3 className="text-base font-semibold text-gray-900">
                   ✅ Confirmation Recorded!
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-sm text-gray-600 mt-1">
                   Your "me too" has been counted. Want to add more details?
                   (Optional)
                 </p>
               </div>
               <button
                 onClick={() => setShowMeTooForm(null)}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xl font-bold"
+                className="text-gray-400 hover:text-gray-600 text-xl font-bold"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -481,7 +481,7 @@ export default function ReportIssuePage({
                 <div>
                   <label
                     htmlFor="meTooName"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-medium text-gray-700 mb-2"
                   >
                     <User className="inline h-4 w-4 mr-1" />
                     Your Name (Optional)
@@ -496,7 +496,7 @@ export default function ReportIssuePage({
                         reporter_name: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900"
                     placeholder="John Doe"
                   />
                 </div>
@@ -504,7 +504,7 @@ export default function ReportIssuePage({
                 <div>
                   <label
                     htmlFor="meTooEmail"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-medium text-gray-700 mb-2"
                   >
                     <Mail className="inline h-4 w-4 mr-1" />
                     Email Address (Optional)
@@ -519,7 +519,7 @@ export default function ReportIssuePage({
                         reporter_email: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -528,7 +528,7 @@ export default function ReportIssuePage({
               <div>
                 <label
                   htmlFor="meTooMessage"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-700 mb-2"
                 >
                   <MessageSquare className="inline h-4 w-4 mr-1" />
                   Additional Details (Optional)
@@ -540,7 +540,7 @@ export default function ReportIssuePage({
                     setMeTooForm({ ...meTooForm, message: e.target.value })
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-900"
                   placeholder="Any additional details about your experience with this issue..."
                 />
               </div>
@@ -551,8 +551,8 @@ export default function ReportIssuePage({
                   disabled={submittingMeToo}
                   className={`flex-1 py-2 px-4 rounded-md font-medium text-white transition-colors text-sm ${
                     submittingMeToo
-                      ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
-                      : "bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700"
                   }`}
                 >
                   {submittingMeToo ? (
@@ -570,7 +570,7 @@ export default function ReportIssuePage({
                 <button
                   type="button"
                   onClick={() => setShowMeTooForm(null)}
-                  className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
+                  className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors text-sm font-medium"
                 >
                   Skip
                 </button>
@@ -580,18 +580,18 @@ export default function ReportIssuePage({
         )}
         {/* Action Options - Show when there are open issues */}
         {issuesData?.openIssues && issuesData.openIssues.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-4">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4">
+            <h3 className="text-base font-semibold text-gray-900 mb-3">
               What would you like to do?
             </h3>
             <div className="space-y-2">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-sm text-gray-600 mb-4">
                 You can add your voice to an existing issue above, or report a
                 completely different problem.
               </p>
               <button
                 onClick={() => setShowReportForm(true)}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors text-sm font-medium"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
               >
                 <Plus className="h-4 w-4" />
                 Report a Different Issue
@@ -604,12 +604,12 @@ export default function ReportIssuePage({
         {showReportForm && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="text-base font-semibold text-gray-900">
                 Report New Issue
               </h3>
               <button
                 onClick={() => setShowReportForm(false)}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xl font-bold"
+                className="text-gray-400 hover:text-gray-600 text-xl font-bold"
               >
                 ×
               </button>
@@ -620,21 +620,21 @@ export default function ReportIssuePage({
 
         {/* Recently Resolved Issues */}
         {issuesData?.resolvedIssues && issuesData.resolvedIssues.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4">
             <button
               onClick={() => setShowResolvedIssues(!showResolvedIssues)}
               className="w-full flex items-center justify-between text-left"
             >
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <h3 className="text-base font-semibold text-gray-900">
                   Resolved Issues ({issuesData.resolvedIssues.length})
                 </h3>
               </div>
               {showResolvedIssues ? (
-                <ChevronDown className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <ChevronDown className="h-5 w-5 text-gray-400" />
               ) : (
-                <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <ChevronRight className="h-5 w-5 text-gray-400" />
               )}
             </button>
 
@@ -643,33 +643,33 @@ export default function ReportIssuePage({
                 {issuesData.resolvedIssues.map((issue) => (
                   <div
                     key={issue.id}
-                    className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 relative overflow-hidden"
+                    className="bg-white border border-gray-200 rounded-lg p-4 relative overflow-hidden"
                   >
                     {/* Success indicator */}
-                    <div className="absolute top-0 left-0 w-1 h-full bg-green-500 dark:bg-green-600"></div>
+                    <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
 
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                             ✓ Resolved
                           </span>
                           {issue.issue_type && (
-                            <span className="text-xs text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 px-2 py-1 rounded-md">
+                            <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded-md">
                               {issue.issue_type}
                             </span>
                           )}
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <div className="flex items-baseline gap-1 text-xs text-green-700 dark:text-green-400 mb-1">
+                        <div className="flex items-baseline gap-1 text-xs text-green-700 mb-1">
                           <CheckCircle className="h-2.5 w-2.5" />
                           Resolved @{" "}
                           {issue.resolved_at
                             ? formatDate(issue.resolved_at)
                             : "Recently"}
                         </div>
-                        <div className="flex items-baseline gap-1 text-xs text-green-700 dark:text-green-400">
+                        <div className="flex items-baseline gap-1 text-xs text-green-700">
                           <Calendar className="h-2.5 w-2.5" />
                           Reported @ {formatDate(issue.reported_at)}
                         </div>
@@ -677,15 +677,15 @@ export default function ReportIssuePage({
                     </div>
 
                     {issue.description && (
-                      <div className="bg-white/60 dark:bg-gray-800/60 rounded p-3 border border-green-100 dark:border-green-800">
-                        <p className="text-sm text-green-900 dark:text-green-200 leading-relaxed">
+                      <div className="bg-white/60 rounded p-3 border border-green-100">
+                        <p className="text-sm text-green-900 leading-relaxed">
                           {issue.description}
                         </p>
                       </div>
                     )}
                     {issue.confirmation_count !== undefined &&
                       issue.confirmation_count > 0 && (
-                        <p className="text-xs text-green-700 dark:text-green-400 mt-3 ms-2 text-right">
+                        <p className="text-xs text-green-700 mt-3 ms-2 text-right">
                           {issue.confirmation_count}{" "}
                           {issue.confirmation_count === 1 ? "person" : "people"}{" "}
                           reported this issue
@@ -702,18 +702,18 @@ export default function ReportIssuePage({
         {issuesData &&
           issuesData.openIssues.length === 0 &&
           issuesData.resolvedIssues.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-4">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4">
+              <h3 className="text-base font-semibold text-gray-900 mb-3">
                 No Current Issues
               </h3>
               <div className="space-y-2">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-gray-600 mb-4">
                   Great! All previous issues have been resolved. Need to report
                   a new issue?
                 </p>
                 <button
                   onClick={() => setShowReportForm(true)}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors text-sm font-medium"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                 >
                   <Plus className="h-4 w-4" />
                   Report an Issue

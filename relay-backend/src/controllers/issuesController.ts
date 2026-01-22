@@ -172,7 +172,7 @@ export const getAllIssues = async (
         issues?.map(async (issue) => {
           if (issue.image_path) {
             const { data: imageData, error: urlError } =
-              await authenticatedSupabase.storage
+              await supabase.storage
                 .from("issue-attachments")
                 .createSignedUrl(issue.image_path, 3600);
 
@@ -256,7 +256,7 @@ export const getAllIssues = async (
       issues?.map(async (issue) => {
         if (issue.image_path) {
           const { data: imageData, error: urlError } =
-            await authenticatedSupabase.storage
+            await supabase.storage
               .from("issue-attachments")
               .createSignedUrl(issue.image_path, 3600); // URL expires in 1 hour (3600 seconds)
 
@@ -343,6 +343,16 @@ export const getIssueById = async (
         return;
       }
 
+      if (issue.image_path) {
+        const { data: imageData, error: urlError } = await supabase.storage
+          .from("issue-attachments")
+          .createSignedUrl(issue.image_path, 3600);
+
+        if (!urlError && imageData) {
+          (issue as any).image_url = imageData.signedUrl;
+        }
+      }
+
       res.json({
         success: true,
         data: issue,
@@ -395,6 +405,16 @@ export const getIssueById = async (
         error: "Issue not found",
       });
       return;
+    }
+
+    if (issue.image_path) {
+      const { data: imageData, error: urlError } = await supabase.storage
+        .from("issue-attachments")
+        .createSignedUrl(issue.image_path, 3600);
+
+      if (!urlError && imageData) {
+        (issue as any).image_url = imageData.signedUrl;
+      }
     }
 
     res.json({
@@ -759,6 +779,21 @@ export const reportIssue = async (
       return;
     }
 
+    // Check if asset exists
+    const { data: assetExists, error: assetError } = await supabase
+      .from("assets")
+      .select("id")
+      .eq("uid", assetUid)
+      .single();
+
+    if (assetError || !assetExists) {
+      res.status(404).json({
+        success: false,
+        error: "Asset not found",
+      });
+      return;
+    }
+
     // Prepare contact info
     const contactInfo = [reporterName, reporterEmail]
       .filter(Boolean)
@@ -1061,6 +1096,21 @@ export const getAssetIssuesPublic = async (
       res.status(400).json({
         success: false,
         error: "Asset UID is required",
+      });
+      return;
+    }
+
+    // Check if asset exists
+    const { data: asset, error: assetError } = await supabase
+      .from("assets")
+      .select("id")
+      .eq("uid", assetUid)
+      .single();
+
+    if (assetError || !asset) {
+      res.status(404).json({
+        success: false,
+        error: "Asset not found",
       });
       return;
     }
@@ -1373,6 +1423,21 @@ export const uploadIssueImage = async (
       return;
     }
 
+    // Check if asset exists
+    const { data: assetExists, error: assetError } = await supabase
+      .from("assets")
+      .select("id")
+      .eq("uid", assetId)
+      .single();
+
+    if (assetError || !assetExists) {
+      res.status(404).json({
+        success: false,
+        error: "Asset not found",
+      });
+      return;
+    }
+
     // Validate file type (already done by multer, but double-check)
     if (!file.mimetype.startsWith("image/")) {
       res.status(400).json({
@@ -1396,6 +1461,41 @@ export const uploadIssueImage = async (
     const fileExt = file.originalname.split(".").pop() || "jpg";
     const filename = `${assetId}-${timestamp}.${fileExt}`;
     const filePath = `issue-images/${filename}`;
+
+    // Ensure bucket exists
+    const { error: getBucketError } = await supabase.storage.getBucket(
+      "issue-attachments"
+    );
+
+    if (getBucketError) {
+      console.log(
+        "Bucket 'issue-attachments' not found or error, attempting to create..."
+      );
+      const { error: createBucketError } = await supabase.storage.createBucket(
+        "issue-attachments",
+        {
+          public: true,
+          fileSizeLimit: 10485760, // 10MB
+          allowedMimeTypes: [
+            "image/png",
+            "image/jpeg",
+            "image/jpg",
+            "image/gif",
+            "image/webp",
+          ],
+        }
+      );
+
+      if (createBucketError) {
+        console.error(
+          "Failed to create bucket 'issue-attachments':",
+          createBucketError
+        );
+        // Continue to try upload, in case it was a false negative on getBucket
+      } else {
+        console.log("Bucket 'issue-attachments' created successfully.");
+      }
+    }
 
     // Upload to Supabase storage (public anonymous uploads allowed)
     const { data, error } = await supabase.storage
